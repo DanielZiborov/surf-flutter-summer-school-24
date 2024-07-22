@@ -25,11 +25,12 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   var currentIndex = 0;
-  void counter(newIndex){
+  void counter(newIndex) {
     setState(() {
-      currentIndex= newIndex;
-    }); 
+      currentIndex = newIndex;
+    });
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,13 +46,22 @@ class _MainAppState extends State<MainApp> {
           centerTitle: true,
         ),
         body: Column(children: [
-          Align(
-            alignment: const Alignment(0.78, 1.0),
-            child: Text("${currentIndex + 1}/${images.length}")
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const IconButton(
+                onPressed: null,
+                icon: Icon(Icons.arrow_back),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Text("${currentIndex + 1}/${images.length}"),
+              ),
+            ],
           ),
           SizedBox(
-            width:500,
-            height:500,
+            width: 500,
+            height: 500,
             child: PageView.builder(
                 onPageChanged: counter,
                 itemCount: images.length,
@@ -61,7 +71,7 @@ class _MainAppState extends State<MainApp> {
                     padding: const EdgeInsets.all(10),
                     child: Image.asset(
                       images[pagePosition],
-                      fit:BoxFit.cover,
+                      fit: BoxFit.cover,
                     ),
                   );
                 }),
