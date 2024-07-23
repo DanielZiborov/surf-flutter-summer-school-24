@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'images.dart';
+import 'second.dart';
 
 class First extends StatelessWidget {
   const First({super.key});
@@ -17,9 +18,7 @@ class First extends StatelessWidget {
         centerTitle: true,
       ),
       body: Column(children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           IconButton(
             onPressed: () {
               Navigator.pushNamed(context, '/second');
@@ -27,7 +26,7 @@ class First extends StatelessWidget {
             icon: const Icon(Icons.arrow_forward),
           ),
           IconButton(
-            onPressed: (){}, 
+            onPressed: () {},
             icon: const Icon(Icons.menu),
           ),
         ]),
@@ -44,10 +43,13 @@ class First extends StatelessWidget {
               return Container(
                 margin: const EdgeInsets.all(4.0),
                 child: GestureDetector(
-                  onTap:(){ Navigator.push(
-                    context,
-                    Builder(builder: builder),
-                  );},
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Second(selectedIndex: index),
+                        ));
+                  },
                   child: Image.asset(
                     images[index],
                     fit: BoxFit.cover,
@@ -61,4 +63,3 @@ class First extends StatelessWidget {
     );
   }
 }
-
