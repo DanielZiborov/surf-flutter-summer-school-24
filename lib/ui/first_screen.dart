@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:surf_flutter_summer_school_24/domains/entity/photos.dart';
 import 'package:surf_flutter_summer_school_24/data/repository/mockphotorepository.dart';
-import 'second.dart';
+import 'package:surf_flutter_summer_school_24/feature/photo/di/photo_inherited.dart';
+import 'package:surf_flutter_summer_school_24/feature/theme/di/theme_inherited.dart';
+import 'second_screen.dart';
 
 class First extends StatefulWidget {
   const First({super.key});
@@ -16,11 +18,14 @@ class _FirstState extends State<First> {
   @override
   void initState() {
     super.initState();
-    futurePhotos = MockPhotoRepository().getPhotos(); 
+    futurePhotos = MockPhotoRepository().getPhotos();
   }
 
   @override
   Widget build(BuildContext context) {
+    final themeController = ThemeInherited.of(context);
+    final photoController = PhotoInherited.of(context);
+
     return FutureBuilder<List<PhotoEntity>>(
       future: futurePhotos,
       builder: (context, snapshot) {
@@ -43,6 +48,19 @@ class _FirstState extends State<First> {
               ),
             ),
             centerTitle: true,
+            actions: [
+              ValueListenableBuilder<ThemeMode>(
+                valueListenable: themeController.themeMode,
+                builder: (context, themeMode, _) {
+                  return IconButton(
+                    icon: Icon(themeMode == ThemeMode.light
+                        ? Icons.dark_mode
+                        : Icons.light_mode),
+                    onPressed: () => themeController.switchThemeMode(),
+                  );
+                },
+              ),
+            ],
           ),
           body: Column(children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -76,6 +94,7 @@ class _FirstState extends State<First> {
                     margin: const EdgeInsets.all(4.0),
                     child: GestureDetector(
                       onTap: () {
+                        photoController.setCurrentIndex(index);
                         Navigator.push(
                             context,
                             MaterialPageRoute(
