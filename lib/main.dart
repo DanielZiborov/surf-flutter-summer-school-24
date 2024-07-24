@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'first.dart';
-import 'second.dart';
+import 'ui/first.dart';
 
 void main() => runApp(const MainApp());
 
@@ -9,13 +8,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const First(),
-        '/second': (context) => const Second(),
-      },
+      home: First(),
     );
   }
 }
