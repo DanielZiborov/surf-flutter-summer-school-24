@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:surf_flutter_summer_school_24/domains/entity/photos.dart';
 import 'package:surf_flutter_summer_school_24/data/repository/mockphotorepository.dart';
 import 'package:surf_flutter_summer_school_24/feature/photo/di/photo_inherited.dart';
+import 'package:surf_flutter_summer_school_24/feature/photo/photo_service/uploadImageToYandexCloud.dart';
+import 'package:surf_flutter_summer_school_24/feature/photo/widgets/ImagePickerWidget.dart';
 import 'package:surf_flutter_summer_school_24/feature/theme/di/theme_inherited.dart';
 import 'second_screen.dart';
 
@@ -25,6 +28,9 @@ class _FirstState extends State<First> {
   Widget build(BuildContext context) {
     final themeController = ThemeInherited.of(context);
     final photoController = PhotoInherited.of(context);
+
+    String name='';
+    String path='';
 
     return FutureBuilder<List<PhotoEntity>>(
       future: futurePhotos,
@@ -60,58 +66,78 @@ class _FirstState extends State<First> {
                   );
                 },
               ),
-            ],
-          ),
-          body: Column(children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               IconButton(
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async{
+                  final file = await Navigator.push<XFile>(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Second(),
+                      builder: (context) => const ImagePickerWidget(),
                     ),
                   );
+                  name = file!.name;
+                  path = file.path;
+                  uploadImageToYandexCloud(name,path);
                 },
-                icon: const Icon(Icons.arrow_forward),
+                icon: const Icon(Icons.add),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.menu),
+            ],
+          ),
+          body: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Second(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.arrow_forward),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.menu),
+                  ),
+                ],
               ),
-            ]),
-            SizedBox(
-              width: 600,
-              height: 600,
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 1.0,
-                ),
-                itemCount: photos.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.all(4.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        photoController.setCurrentIndex(index);
-                        Navigator.push(
+              SizedBox(
+                width: 600,
+                height: 600,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 1.0,
+                  ),
+                  itemCount: photos.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: const EdgeInsets.all(4.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          photoController.setCurrentIndex(index);
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
                                   Second(selectedIndex: index),
-                            ));
-                      },
-                      child: Image.asset(
-                        photos[index].getUrl,
-                        fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                        child: Image.asset(
+                          photos[index].getUrl,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            )
-          ]),
+            ],
+          ),
         );
       },
     );

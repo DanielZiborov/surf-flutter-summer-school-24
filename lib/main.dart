@@ -17,8 +17,12 @@ void main() async {
   final themeController = ThemeController(themeRepository: themeRepository);
   final photoController = PhotoController();
 
-  runApp(MainApp(
-      themeController: themeController, photoController: photoController));
+  runApp(
+    MainApp(
+      themeController: themeController,
+      photoController: photoController,
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
