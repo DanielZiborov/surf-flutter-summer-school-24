@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import 'package:surf_flutter_summer_school_24/domains/entity/photos.dart';
 import 'package:surf_flutter_summer_school_24/data/repository/mockphotorepository.dart';
 import 'package:surf_flutter_summer_school_24/feature/photo/di/photo_inherited.dart';
-import 'package:surf_flutter_summer_school_24/feature/photo/photo_service/uploadImageToYandexCloud.dart';
-import 'package:surf_flutter_summer_school_24/feature/photo/widgets/ImagePickerWidget.dart';
 import 'package:surf_flutter_summer_school_24/feature/theme/di/theme_inherited.dart';
+import 'package:surf_flutter_summer_school_24/widgets/photo_picker_widget.dart';
 import 'second_screen.dart';
 
 class First extends StatefulWidget {
@@ -17,6 +17,8 @@ class First extends StatefulWidget {
 
 class _FirstState extends State<First> {
   late Future<List<PhotoEntity>> futurePhotos;
+  final List<XFile> _selectedImages = [];
+  final _uuid = const Uuid();
 
   @override
   void initState() {
@@ -24,13 +26,35 @@ class _FirstState extends State<First> {
     futurePhotos = MockPhotoRepository().getPhotos();
   }
 
+  Future<void> _navigateToPhotoPicker(BuildContext context) async {
+    final result = await Navigator.push<XFile>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PhotoPickerWidget(),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedImages.add(result);
+      });
+    }
+  }
+
+  List<PhotoEntity> _createPhotoEntitiesFromFiles(List<XFile> files) {
+    return files.map((file) {
+      return PhotoEntity(
+        id: _uuid.v4(),
+        url: file.path,
+        createdAt: DateTime.now(),
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeController = ThemeInherited.of(context);
     final photoController = PhotoInherited.of(context);
-
-    String name='';
-    String path='';
 
     return FutureBuilder<List<PhotoEntity>>(
       future: futurePhotos,
@@ -44,6 +68,10 @@ class _FirstState extends State<First> {
         }
 
         List<PhotoEntity> photos = snapshot.data!;
+
+        if (_selectedImages.isNotEmpty) {
+          photos = _createPhotoEntitiesFromFiles(_selectedImages) + photos;
+        }
 
         return Scaffold(
           appBar: AppBar(
@@ -65,20 +93,6 @@ class _FirstState extends State<First> {
                     onPressed: () => themeController.switchThemeMode(),
                   );
                 },
-              ),
-              IconButton(
-                onPressed: () async{
-                  final file = await Navigator.push<XFile>(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ImagePickerWidget(),
-                    ),
-                  );
-                  name = file!.name;
-                  path = file.path;
-                  uploadImageToYandexCloud(name,path);
-                },
-                icon: const Icon(Icons.add),
               ),
             ],
           ),
@@ -104,36 +118,44 @@ class _FirstState extends State<First> {
                   ),
                 ],
               ),
-              SizedBox(
-                width: 600,
-                height: 600,
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 1.0,
-                  ),
-                  itemCount: photos.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.all(4.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          photoController.setCurrentIndex(index);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  Second(selectedIndex: index),
-                            ),
-                          );
-                        },
-                        child: Image.asset(
-                          photos[index].getUrl,
-                          fit: BoxFit.cover,
+              ElevatedButton(
+                onPressed: () => _navigateToPhotoPicker(context),
+                child: const Text('Pick a Photo'),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 1.0,
+                    ),
+                    itemCount: photos.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        margin: const EdgeInsets.all(4.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            photoController.setCurrentIndex(index);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    Second(selectedIndex: index),
+                              ),
+                            );
+                          },
+                          child: 
+                          Image.asset(
+                            photos[index].getUrl,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
