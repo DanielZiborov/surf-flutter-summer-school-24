@@ -85,7 +85,7 @@ class _CarouselState extends State<Carousel> {
                   itemBuilder: (context, pagePosition) {
                     return Padding(
                       padding: const EdgeInsets.all(10),
-                      child: Image.asset(
+                      child: Image.network(
                         photos[pagePosition].getUrl,
                         fit: BoxFit.cover,
                       ),

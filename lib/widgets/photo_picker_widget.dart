@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:surf_flutter_summer_school_24/services/image_picker_service.dart';
+import 'package:surf_flutter_summer_school_24/services/upload.dart';
 
 class PhotoPickerWidget extends StatefulWidget {
   const PhotoPickerWidget({super.key});
@@ -55,6 +56,7 @@ class _PhotoPickerWidgetState extends State<PhotoPickerWidget> {
                     Image.file(File(image.path)),
                     ElevatedButton(
                       onPressed: () {
+                        uploadPhoto(image);
                         Navigator.pop(context, image);
                       },
                       child: const Text('Confirm Selection'),

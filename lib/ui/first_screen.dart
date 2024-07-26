@@ -148,7 +148,7 @@ class _FirstState extends State<First> {
                             );
                           },
                           child: 
-                          Image.asset(
+                          Image.network(
                             photos[index].getUrl,
                             fit: BoxFit.cover,
                           ),
